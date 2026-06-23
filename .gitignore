@@ -1,0 +1,9 @@
+.venv/
+.venv_test/
+__pycache__/
+*.pyc
+_report_out/
+._ui_tmp/
+.sdd/
+_tested_picks.csv
+wheelhouse/
