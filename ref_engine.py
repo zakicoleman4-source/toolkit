@@ -39,6 +39,7 @@ import glob
 import os
 import struct
 import subprocess
+from _ffmpeg import ffmpeg_exe as _ffmpeg_bin
 import sys
 
 import numpy as np
@@ -164,7 +165,7 @@ def read_ubx_utc_seconds(path):
 
 def decode_to_samples(path, target_fs):
     """Decode any audio via ffmpeg -> mono float64 at target_fs."""
-    cmd = ["ffmpeg", "-v", "error", "-i", path, "-ac", "1",
+    cmd = [_ffmpeg_bin(), "-v", "error", "-i", path, "-ac", "1",
            "-ar", str(target_fs), "-f", "f32le", "-"]
     out = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
     return np.frombuffer(out.stdout, dtype="<f4").astype(np.float64)

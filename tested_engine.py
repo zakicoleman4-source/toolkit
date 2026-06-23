@@ -33,6 +33,7 @@ import glob
 import os
 import re
 import subprocess
+from _ffmpeg import ffmpeg_exe as _ffmpeg_bin
 import sys
 import wave
 
@@ -287,7 +288,7 @@ def read_wav_mono(path):
 def decode_to_samples(path, target_fs):
     """Decode any audio (mp3/wav/...) via ffmpeg to mono float32 at target_fs."""
     cmd = [
-        "ffmpeg", "-v", "error", "-i", path,
+        _ffmpeg_bin(), "-v", "error", "-i", path,
         "-ac", "1", "-ar", str(target_fs), "-f", "f32le", "-",
     ]
     out = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
