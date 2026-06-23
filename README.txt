@@ -22,3 +22,9 @@ SETUP NOTES
   needed IF the machine's Python is 3.13). If those wheels do not match,
   it falls back to pip's normal index (needs pip access).
 - Requires Python 3 (3.13 recommended for fully-offline install).
+
+------------------------------------------------------------
+RESET / CLEAN
+- To rebuild from scratch (e.g. after an update): double-click reset.bat,
+  confirm, then double-click run.bat. run.bat also self-heals a missing
+  package automatically, so a manual reset is rarely needed.
