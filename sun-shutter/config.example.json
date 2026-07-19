@@ -1,0 +1,36 @@
+{
+  "_comment": "Copy this to config.json and edit for the real flat. Angles are degrees clockwise from true north (0=N, 90=E, 180=S, 270=W).",
+
+  "location": {
+    "latitude": 32.3215,
+    "longitude": 34.8532,
+    "timezone": "Asia/Jerusalem"
+  },
+
+  "window": {
+    "label": "living room (faces the sea)",
+    "facing_azimuth": 270,
+    "view_half_angle": 90,
+    "min_sun_elevation": 0,
+    "horizon": {
+      "_comment": "Obstruction elevation (deg) the sun must clear, per azimuth. Fill from GIS data via sunshutter.gis.build_horizon_profile, or hand-edit. Empty = clean flat horizon.",
+      "default_elevation": 0,
+      "samples": {}
+    }
+  },
+
+  "darkness_depth": -0.833,
+  "_darkness_depth_note": "How far below the horizon the sun sinks before 'dark'. 0 = geometric sunset, -0.833 = standard sunset (disc + refraction), -6 = end of civil twilight.",
+
+  "open_on": "first_light",
+  "close_on": "darkness",
+
+  "shutter": {
+    "type": "mock",
+    "_type_note": "Use 'mock' to dry-run with no hardware. Switch to 'http' and fill in the URLs once the hub API is known.",
+    "open":  {"url": "http://REPLACE-ME/shutter/up",   "method": "POST"},
+    "close": {"url": "http://REPLACE-ME/shutter/down", "method": "POST"},
+    "headers": {"Authorization": "Bearer REPLACE-ME"},
+    "timeout": 10
+  }
+}
