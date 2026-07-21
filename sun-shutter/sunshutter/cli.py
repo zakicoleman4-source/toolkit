@@ -66,6 +66,35 @@ def cmd_forecast(args) -> int:
     return 0
 
 
+def cmd_discover(args) -> int:
+    import asyncio
+
+    from .switcher import discover_devices_async
+
+    print(f"Listening for Switcher devices on the LAN for {args.timeout:.0f}s ...")
+    try:
+        devices = asyncio.run(discover_devices_async(timeout=args.timeout))
+    except RuntimeError as exc:
+        print(f"error: {exc}")
+        return 1
+    if not devices:
+        print("No devices found. Ensure this machine is on the same network/subnet")
+        print("as the Runner, and that broadcast traffic is not blocked.")
+        return 1
+    for d in devices:
+        print("-" * 48)
+        print(f"  name       : {d.get('name')}")
+        print(f"  device_type: {d.get('device_type')}")
+        print(f"  device_id  : {d.get('device_id')}")
+        print(f"  device_key : {d.get('device_key')}")
+        print(f"  ip_address : {d.get('ip_address')}")
+    print("-" * 48)
+    print("Copy device_type / device_id / device_key / ip_address into the")
+    print('shutter block of config.json (type: \"switcher\"). S11/S12 also need a')
+    print("token from Switcher.")
+    return 0
+
+
 def cmd_run(args) -> int:
     cfg = load_config(args.config)
     controller = build_controller(cfg.shutter)
@@ -92,6 +121,10 @@ def build_parser() -> argparse.ArgumentParser:
     f = sub.add_parser("forecast", help="Show trigger times for the next N days.")
     f.add_argument("--days", type=int, default=7)
     f.set_defaults(func=cmd_forecast)
+
+    d = sub.add_parser("discover", help="Find Switcher devices on the LAN (needs aioswitcher).")
+    d.add_argument("--timeout", type=float, default=12.0, help="Seconds to listen.")
+    d.set_defaults(func=cmd_discover)
 
     sub.add_parser("run", help="Run the always-on control loop.").set_defaults(func=cmd_run)
     return p

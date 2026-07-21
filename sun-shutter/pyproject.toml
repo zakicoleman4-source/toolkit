@@ -13,6 +13,8 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=7"]
+# Real Switcher Runner control (local-network). Only needed for shutter.type = "switcher".
+switcher = ["aioswitcher>=4"]
 
 [project.scripts]
 sunshutter = "sunshutter.cli:main"

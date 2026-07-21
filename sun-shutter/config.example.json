@@ -27,7 +27,21 @@
 
   "shutter": {
     "type": "mock",
-    "_type_note": "Use 'mock' to dry-run with no hardware. Switch to 'http' and fill in the URLs once the hub API is known.",
+    "_type_note": "Options: 'mock' (dry-run, no hardware), 'switcher' (Switcher Runner over LAN), or 'http' (generic hub). Only the block for the chosen type is used.",
+
+    "_switcher_note": "For the friend's Switcher Runner. Find device_type/device_id/device_key/ip_address by running: python -m sunshutter discover. Give the Runner a static/reserved IP. token is ONLY needed for Runner S11/S12 (request it from Switcher); leave null for RUNNER / RUNNER_MINI. position: 100=open, 0=closed.",
+    "switcher": {
+      "device_type": "RUNNER",
+      "ip_address": "192.168.1.50",
+      "device_id": "REPLACE-ME",
+      "device_key": "REPLACE-ME",
+      "token": null,
+      "index": 0,
+      "open_position": 100,
+      "close_position": 0
+    },
+
+    "_http_note": "Generic fallback for any other hub with an HTTP API.",
     "open":  {"url": "http://REPLACE-ME/shutter/up",   "method": "POST"},
     "close": {"url": "http://REPLACE-ME/shutter/down", "method": "POST"},
     "headers": {"Authorization": "Bearer REPLACE-ME"},

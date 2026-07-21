@@ -131,4 +131,11 @@ def build_controller(config: Dict[str, Any]) -> ShutterController:
             headers=config.get("headers"),
             timeout=config.get("timeout", 10.0),
         )
+    if kind == "switcher":
+        # Imported here so the optional aioswitcher dependency is only touched
+        # when a Switcher device is actually configured. Accept the settings
+        # either nested under a "switcher" key or flat on the shutter block.
+        from .switcher import build_switcher_controller
+
+        return build_switcher_controller(config.get("switcher", config))
     raise ValueError(f"Unknown shutter controller type: {kind!r}")

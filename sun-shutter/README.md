@@ -70,8 +70,60 @@ Everything lives in one JSON file (`config.example.json` is documented):
 
 ## Wiring up the real shutter
 
-The scheduler only calls `open()` / `close()` on a controller, so any hub is
-supported by configuration or a tiny subclass:
+The scheduler only ever calls `open()` / `close()` on a controller, so any hub
+is supported by configuration or a tiny subclass. Three backends ship today:
+`mock` (dry run), `switcher` (Switcher Runner), and `http` (generic).
+
+### Switcher Runner (the friend's shutter)
+
+Switcher's shutter/blind products are the **Runner** line (Runner, Runner
+Mini, Runner S11, Runner S12). They're controlled over the **local network**
+(no cloud) via the `aioswitcher` library — the same one Home Assistant uses.
+It's an **optional** dependency, so install it only for the real device:
+
+```bash
+pip install "sunshutter[switcher]"     # or: pip install aioswitcher
+```
+
+Find the Runner on the LAN (run this on a machine on the same subnet):
+
+```bash
+python -m sunshutter discover
+#   device_type: RUNNER
+#   device_id  : abcd12
+#   device_key : 18
+#   ip_address : 192.168.1.50
+```
+
+Then set the `switcher` block in `config.json`:
+
+```json
+"shutter": {
+  "type": "switcher",
+  "switcher": {
+    "device_type": "RUNNER",
+    "ip_address": "192.168.1.50",
+    "device_id": "abcd12",
+    "device_key": "18",
+    "token": null,
+    "index": 0,
+    "open_position": 100,
+    "close_position": 0
+  }
+}
+```
+
+Notes:
+- Give the Runner a **static / DHCP-reserved IP** so it doesn't move.
+- `token` is needed **only** for the newer **S11 / S12** (request it from
+  Switcher — they email a token tied to your account). Leave it `null` for
+  `RUNNER` / `RUNNER_MINI`.
+- Position is a percentage: `100` = open, `0` = closed (swap them if a
+  particular install is wired the other way).
+
+### Generic HTTP hub
+
+For any other hub with an HTTP API:
 
 ```json
 "shutter": {
@@ -83,8 +135,9 @@ supported by configuration or a tiny subclass:
 }
 ```
 
-If the hub speaks a protocol that isn't plain HTTP, subclass
-`ShutterController` in `shutter.py` and return it from `build_controller`.
+If a hub speaks some other protocol entirely, subclass `ShutterController`
+(see `switcher.py` for a worked example) and return it from
+`build_controller`.
 
 ## Using the Netanya GIS building data
 
@@ -123,6 +176,7 @@ sun-shutter/
     gis.py         GIS buildings -> obstruction horizon
     events.py      daily first-light / darkness triggers
     shutter.py     shutter controllers (mock + HTTP template)
+    switcher.py    Switcher Runner backend (optional aioswitcher dep)
     scheduler.py   the always-on control loop
     config.py      config loading
     cli.py         command-line interface
@@ -140,10 +194,12 @@ python -m pytest tests/ -q
 ## Status / next steps
 
 Working today: solar engine, window+horizon model, GIS→horizon conversion,
-daily event computation, scheduler, mock + HTTP shutter backends, CLI, tests.
+daily event computation, scheduler, mock + **Switcher Runner** + HTTP shutter
+backends, LAN discovery, CLI, tests.
 
 To finish for the real installation:
 1. Get the real Netanya GIS extract for his block and his floor height →
    generate `window.horizon.samples`.
-2. Get the shutter hub API (endpoint, auth) → fill in the `http` shutter config.
+2. Run `python -m sunshutter discover` on his network → fill in the `switcher`
+   block (and get a token from Switcher if it's a Runner S11/S12).
 3. Deploy the `run` loop on an always-on device (systemd unit / cron `@reboot`).
